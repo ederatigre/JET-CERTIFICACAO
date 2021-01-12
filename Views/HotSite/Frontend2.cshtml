@@ -1,0 +1,62 @@
+@{
+    ViewBag.Title = "Certificacao";
+    Layout = "~/Views/Shared/Base/_LayoutBreadCrumbContent.cshtml";
+}
+
+@section breadcrumbs {
+    <div class="ui container">
+        <div class="ui one column grid stackable middle aligned">
+            <div class="row">
+                <div class="column">
+                    <h1>@ViewBag.Title</h1>
+                    <div class="ui breadcrumb text small">
+                        <a class="section" href="/">Home</a>
+                        <i class="right angle icon divider"></i>
+                        <a class="section" href="/">Certificação</a>
+                        <i class="right angle icon divider"></i>
+                        <a class="section" href="/">Formulário</a>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<div class="ui container margin bottom large">
+    <div class="ui grid">
+        <div class="eight wide column">            
+                <div class="field">
+                    <label><b>Nome:</b></label>
+                    <span id="nome"></span>
+                </div>
+                <div class="field">
+                    <label><b>Email:</b></label>
+                    <span id="email"></span>
+                </div>
+                <div class="field">
+                    <label><b>Telefone:</b></label>
+                    <span id="telefone"></span>
+                </div>
+                <div class="field">
+                    <label><b>Assunto:</b></label>
+                    <span id="assunto"></span>
+                </div>
+                <div class="field">
+                    <label><b>Mensagem:</b></label>
+                    <span id="mensagem"></span>
+                </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    document.getElementById("nome").innerText = sessionStorage.getItem("nome");
+    document.getElementById("email").innerText = sessionStorage.getItem("email");
+    document.getElementById("telefone").innerText = sessionStorage.getItem("telefone");
+    document.getElementById("assunto").innerText = sessionStorage.getItem("assunto");
+    document.getElementById("mensagem").innerText = sessionStorage.getItem("mensagem");
+    
+</script>
