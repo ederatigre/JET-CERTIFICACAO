@@ -1,6 +1,3 @@
-import { createModelExhausted } from "../../api/checkout/mini_cart";
-import { generateRecaptcha } from "../../ui/modules/recaptcha";
-
 
 var xhrPayPalReference = null;
 var xhrPayPalInstallments  = null;
@@ -214,7 +211,7 @@ function PayPalCheckoutInCart2() {
                         IdAddress: ""
                     },
                     success: function (response) {
-                        if (response.links != null && response.links.length > 0) {
+                        if (response.links.length > 0) {
                             for (var key in response.links) {
                                 if (response.links[key].rel == "approval_url") {
                                     token = response.links[key].href.match(/EC-\w+/)[0];
@@ -239,18 +236,7 @@ function PayPalCheckoutInCart2() {
                     success: function (response) {
                         if (response.success === true) {
                             if (response.message === "") {
-                                $(".loadingCheckout").remove();
-                                swal({
-                                    title: '',
-                                    html: 'A partir do seu login no Paypal identificamos que você já possui uma conta em nossa loja e lhe redirecionaremos para a página de pagamento. Por gentileza, revise seu pedido antes de concluí-lo!',
-                                    type: 'success',
-                                    showCancelButton: false,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'OK'
-                                }).then(function () {
-                                    window.location.href = response.redirect;
-                                });
+                                window.location.href = response.redirect;
                             } else {
                                 $(".loadingCheckout").remove();
                                 swal({
@@ -276,7 +262,7 @@ function PayPalCheckoutInCart2() {
                                 cancelButtonColor: '#d33',
                                 confirmButtonText: 'OK'
                             }).then(function () {
-                                if (response.redirect === "/checkout/Register") {
+                                if (response.redirect !== "") {
                                     let _html = '';
                                     _html += '<form id="frmRedirectRegister" action="' + response.redirect + '" method="post">';
                                     _html += '    <input type="hidden" name="login" value="' + response.order.payer.payer_info.email + '">';
@@ -285,8 +271,6 @@ function PayPalCheckoutInCart2() {
                                     _html += '</form>';
                                     $('body').append(_html);
                                     $('#frmRedirectRegister').submit();
-                                } else if (response.redirect !== "") {
-                                    window.location.href = response.redirect;
                                 }
                             });
                         }
@@ -347,9 +331,11 @@ export function PayPalCheckoutReference() {
                             Value: _value
                         },
                         success: function (responseInstallments) {
+                            //console.log(responseInstallments);
                             if (responseInstallments.success === true) {
                                 let _installmentsNeo = responseInstallments.installmentsNeo.ListInstallment;
                                 let _installmentsPayPal = responseInstallments.installments.financing_options[0].qualifying_financing_options;
+                                let _billingAgreement = responseReference.reference.BillingAgreement;
                                 let _html = "<p><strong>Olá " + responseReference.reference.Name + "</strong></p>";
                                 _html += "<p><i class=\"barcode alternative icon\"></i>" + responseReference.reference.Email + "</p>";
                                 _html += "<p>Para trocar o cartão de crédito vinculado à sua conta PayPal, <a href=\"javascript:void(0);\" id=\"payPalDeleteReference\"><strong>clique aqui.</string></a></p>";
@@ -373,10 +359,8 @@ export function PayPalCheckoutReference() {
                                     let Value = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(_installmentsNeo[i].Value);
 
                                     if (i === 0) {
-                                        let DiscountAmount = 0;
-                                        if (_installmentsPayPal[0].discount_amount !== null) DiscountAmount = _installmentsPayPal[0].discount_amount.value;
-                                        let DiscountAmountPercent = 0;
-                                        if (_installmentsPayPal[0].discount_percentage !== null) DiscountAmountPercent = _installmentsPayPal[0].discount_percentage;
+                                        let DiscountAmount = _installmentsPayPal[0].discount_amount.value;
+                                        let DiscountAmountPercent = _installmentsPayPal[0].discount_percentage;
                                         InstallmentValue = _installmentsPayPal[0].monthly_payment.value;
                                         InstallmentTotal = _installmentsPayPal[0].total_cost.value;
                                         if (parseFloat(DiscountAmount) > 0) {
@@ -391,10 +375,7 @@ export function PayPalCheckoutReference() {
                                 _html += "</select></p>";
                                 _html += "<button id=\"finalizarPedidoPayPalReference\" class=\"ui labeled icon action large fluid button\">Finalizar Pedido</button>";
                                 _html += "</form>";
-
                                 $('#paypal-button-reference').empty().append(_html);
-
-                                $('#payPalReferenceDescription').hide();
 
                                 $('#payPalDeleteReference').unbind().click(function () {
                                     if (xhrPayPalReference !== null) {
@@ -422,24 +403,6 @@ export function PayPalCheckoutReference() {
                                 });
 
                                 $('#finalizarPedidoPayPalReference').unbind().click(function () {
-
-                                    let _totalCarrinho = parseFloat($('#total_checkout').html().trim().replace('R$', '').trim().replace('.', '').replace(',', '.').trim());
-                                    let _totalReference = parseFloat($('#installmentsReference > option:selected').data('installmenttotal')) + parseFloat($('#installmentsReference > option:selected').data('installmentdiscount'));
-                                    if (_totalCarrinho !== _totalReference) {
-                                        swal({
-                                            title: 'Falha',
-                                            html: "O parcelamento está desatualizar, tente novamente!",
-                                            type: 'warning',
-                                            showCancelButton: false,
-                                            confirmButtonColor: '#3085d6',
-                                            cancelButtonColor: '#d33',
-                                            confirmButtonText: 'OK'
-                                        }).then(function () {
-                                            window.location.reload(true);
-                                        });
-                                        return false;
-                                    }
-
                                     var idCustomer = $("#idCustomer").val();
                                     var idAddress = $("#idAddress").val();
                                     var presente = $("#presente").val();
@@ -611,25 +574,9 @@ export function PayPalCheckoutReference() {
                                 });
 
                             }
-                            else {
-                                swal({
-                                    title: '',
-                                    html: "Não foi possível carregar o parcelamento!",
-                                    type: 'warning',
-                                    showCancelButton: false,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'OK'
-                                });
-
-                                $('#paypal-button-reference').removeAttr("style").empty();
-                                $('#finalizarPedidoPayPalReference').removeClass("loading");
-                                $('#finalizarPedidoPayPalReference').removeClass("disabled");
-                            }
                         }
                     });
                 } else {
-                    $('#payPalReferenceDescription').show();
                     $('#paypal-button-reference').empty();
 
                     paypal.Button.render({
@@ -640,8 +587,7 @@ export function PayPalCheckoutReference() {
                             color: $('#ButtonColorPayPalCheckoutReference').val(), // gold & blue & silver & white & black
                             shape: $('#ButtonFormatPayPalCheckoutReference').val(),
                             label: 'pay', // checkout & pay & buynow & paypal
-                            fundingicons: 'false',
-                            tagline: 'false'
+                            fundingicons: 'true'
                         },
                         // 1. Creating the Billing Agreement Token
                         payment: function (data, actions) {
@@ -675,8 +621,7 @@ export function PayPalCheckoutReference() {
                                 }
                             });
 
-                        },
-                        onError: function (data, actions) {
+                        }, onError: function (data, actions) {
                             // Show generic error message to the customer and return him to the checkout page
                             swal({
                                 title: '',
@@ -687,8 +632,7 @@ export function PayPalCheckoutReference() {
                                 cancelButtonColor: '#d33',
                                 confirmButtonText: 'OK'
                             });
-                        },
-                        onCancel: function (data, actions) {
+                        }, onCancel: function (data, actions) {
                             // Return the customer to the checkout page
                         }
                     }, '#paypal-button-reference');
@@ -866,7 +810,6 @@ export function PayPalCheckoutTransparent() {
 
     if ($('#paypal-cc-form').length > 0) {
         $('#continueButton').hide();
-        $("#installmentCheckoutTransparent").html("<option>Aguarde carregando.</option>");
 
         $.ajax({
             method: "POST",
@@ -883,8 +826,6 @@ export function PayPalCheckoutTransparent() {
                     objParcelamento = response.ListInstallment;
 
                 if (objParcelamento.length > 0) {
-                    let _hasInterest = false;
-                    let _installmentTotal = 0;
                     let option = "<option value='0'>Selecione o parcelamento</option>";
                     for (let i = 0; i < objParcelamento.length; i++) {
                         let IdInstallment = objParcelamento[i].IdInstallment;
@@ -894,17 +835,9 @@ export function PayPalCheckoutTransparent() {
                         let Description = objParcelamento[i].Description;
                         let Value = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(objParcelamento[i].Value);
 
-                        if (i === 0)
-                            _installmentTotal = InstallmentTotal;
-
-                        if (Description !== "Sem Juros")
-                            _hasInterest = true;
-
                         option += "<option value='" + IdInstallment + "' data-InstallmentNumber='" + InstallmentNumber + "' data-InstallmentValue='" + InstallmentValue + "' data-InstallmentTotal='" + InstallmentTotal + "'>" + InstallmentNumber + "x de " + Value + "(" + Description + ")</option>";
-
-                    }
-                    if (_hasInterest === true) {
                         $("#installmentCheckoutTransparent").html(option);
+
                         $("#installmentCheckoutTransparent").unbind().change(function () {
                             if ($(this).val() !== "0") {
 
@@ -927,7 +860,7 @@ export function PayPalCheckoutTransparent() {
                                             let approval_url = "";
                                             if (order.links.length > 0) {
                                                 for (var key in order.links) {
-                                                    if (order.links[key].rel === "approval_url") {
+                                                    if (order.links[key].rel == "approval_url") {
                                                         approval_url = order.links[key].href;
                                                     }
                                                 }
@@ -937,8 +870,7 @@ export function PayPalCheckoutTransparent() {
 
                                             let _customerFirstName = customer.Name;
                                             let _customerLastName = "";
-                                            _customerFirstName = _customerFirstName.trim();
-                                            let arrCustomerName = _customerFirstName.split(' ');
+                                            let arrCustomerName = customer.Name.split(' ');
                                             if (arrCustomerName.length > 1) {
                                                 _customerFirstName = arrCustomerName[0];
                                                 _customerLastName = arrCustomerName[arrCustomerName.length - 1];
@@ -1004,113 +936,7 @@ export function PayPalCheckoutTransparent() {
                                     }
                                 });
                             }
-                            else {
-                                $('#continueButton').hide();
-                                $('#paypal-cc-form').empty();
-                            }
                             return false;
-                        });
-                    }
-                    else {
-                        $("#installmentCheckoutTransparent").hide();
-                        $('#paypal-cc-form').removeAttr("style").empty().append('<div class="ui active inverted dimmer padding top bottom large loadingCheckout" style="position: fixed;"><div class="ui text loader">Aguarde</div></div>');
-                        $.ajax({
-                            method: 'POST',
-                            url: '/Checkout/PayPalCreateOrderCheckoutTransparent',
-                            data: {
-                                IdAddress: $('#idAddress').val(),
-                                InstallmentTotal: _installmentTotal
-                            },
-                            success: function (response) {
-
-                                if (response.success === true) {
-
-                                    let order = response.order;
-                                    let customer = response.customer;
-
-                                    let approval_url = "";
-                                    if (order.links.length > 0) {
-                                        for (var key in order.links) {
-                                            if (order.links[key].rel === "approval_url") {
-                                                approval_url = order.links[key].href;
-                                            }
-                                        }
-                                    }
-
-                                    $('#PaymentIdPayPalCheckoutTransparent').val(order.id);
-
-                                    let _customerFirstName = customer.Name;
-                                    let _customerLastName = "";
-                                    let arrCustomerName = customer.Name.split(' ');
-                                    if (arrCustomerName.length > 1) {
-                                        _customerFirstName = arrCustomerName[0];
-                                        _customerLastName = arrCustomerName[arrCustomerName.length - 1];
-                                    }
-                                    let _customerPhone = customer.Phone.Phone1;
-                                    let _customerTaxId = customer.Cpf_cnpj;
-                                    let _customerEmail = customer.Email;
-                                    let _oneclick = response.oneclick.replace(/\"/g, '');
-
-                                    let objPayPal = {
-                                        "approvalUrl": approval_url,
-                                        "placeholder": "paypal-cc-form",
-                                        "mode": $('#EnvPayPalCheckoutTransparent').val(),
-                                        "payerFirstName": _customerFirstName,
-                                        "payerLastName": _customerLastName,
-                                        "payerEmail": _customerEmail,
-                                        "payerPhone": _customerPhone,
-                                        "payerTaxId": _customerTaxId,
-                                        "payerTaxIdType": "BR_CPF",
-                                        "language": "pt_BR",
-                                        "country": "BR",
-                                        "disableContinue": "continueButton",
-                                        "enableContinue": "continueButton",
-                                        "merchantInstallmentSelectionOptional": true,
-                                        //"merchantInstallmentSelection": $("#installmentCheckoutTransparent option:selected").attr("data-InstallmentNumber"),
-                                        "rememberedCards": _oneclick
-                                    };
-
-                                    //console.log(objPayPal);
-
-                                    ppp = PAYPAL.apps.PPP(objPayPal);
-                                    //ppp.setIframeHeight(500);
-                                    $('#continueButton').show().unbind().click(function () {
-                                        ppp.doContinue();
-                                        $("#installmentCheckoutTransparent").attr('disabled', true);
-                                        return false;
-                                    });
-                                } else {
-                                    swal({
-                                        title: '',
-                                        html: "Falha ao gerar formulário do PayPal",
-                                        type: 'warning',
-                                        showCancelButton: false,
-                                        confirmButtonColor: '#3085d6',
-                                        cancelButtonColor: '#d33',
-                                        confirmButtonText: 'OK'
-                                    });
-
-                                    $('#continueButton').hide();
-                                    $('#paypal-cc-form').empty();
-                                }
-                            },
-                            error: function () {
-                                swal({
-                                    title: '',
-                                    html: "Falha ao gerar pré pedido no PayPal",
-                                    type: 'warning',
-                                    showCancelButton: false,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'OK'
-                                });
-
-                                $('#continueButton').hide();
-                                $('#paypal-cc-form').empty();
-                            },
-                            complete: function () {
-
-                            }
                         });
                     }
                 }
@@ -1256,38 +1082,16 @@ function messageListener(event) {
                 var payPalPayerId = message.result.payer.payer_info.payer_id; //use it on executePayment API
                 var payPalOrderId = message.result.id;
                 var payPalPaymentId = $('#PaymentIdPayPalCheckoutTransparent').val();
-                var idInstallment = 0;
-                var installmentNumber = 0;
-                var installmentValue = 0;
-                var installmentTotal = 0;
 
-                if ($('#installmentCheckoutTransparent').is(':visible') === true) {
+                var idInstallment = $('#installmentCheckoutTransparent').val();
+                var installmentNumber = $('#installmentCheckoutTransparent option:selected').attr('data-InstallmentNumber');
+                var installmentValue = $('#installmentCheckoutTransparent option:selected').attr('data-InstallmentValue');
+                var installmentTotal = $('#installmentCheckoutTransparent option:selected').attr('data-InstallmentTotal');
 
-                    idInstallment = $('#installmentCheckoutTransparent').val();
-                    installmentNumber = $('#installmentCheckoutTransparent option:selected').attr('data-InstallmentNumber');
-                    installmentValue = $('#installmentCheckoutTransparent option:selected').attr('data-InstallmentValue');
-                    installmentTotal = $('#installmentCheckoutTransparent option:selected').attr('data-InstallmentTotal');
+                if (parseInt(installmentNumber, 10) > 1) {
+                    if (typeof (message.result.term) !== "undefined") {
 
-                    if (parseInt(installmentNumber, 10) > 1) {
-                        if (typeof (message.result.term) !== "undefined") {
-
-                            if (parseInt(installmentNumber, 10) !== parseInt(message.result.term.term, 10)) {
-                                swal({
-                                    title: '',
-                                    html: "O número de parcelas do PayPal é diferente do escolhido na loja, entre em contato com a Loja.",
-                                    type: 'warning',
-                                    showCancelButton: false,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'OK'
-                                }).then(function () {
-                                    $("#installmentCheckoutTransparent").removeAttr('disabled');
-                                    window.location.reload(true);
-                                });
-
-                                return false;
-                            }
-                        } else {
+                        if (parseInt(installmentNumber, 10) !== parseInt(message.result.term.term, 10)) {
                             swal({
                                 title: '',
                                 html: "O número de parcelas do PayPal é diferente do escolhido na loja, entre em contato com a Loja.",
@@ -1303,27 +1107,28 @@ function messageListener(event) {
 
                             return false;
                         }
-                    }
+                    } else {
+                        swal({
+                            title: '',
+                            html: "O número de parcelas do PayPal é diferente do escolhido na loja, entre em contato com a Loja.",
+                            type: 'warning',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'OK'
+                        }).then(function () {
+                            $("#installmentCheckoutTransparent").removeAttr('disabled');
+                            window.location.reload(true);
+                        });
 
-                    if (typeof (message.result.term) !== "undefined" && installmentNumber === "1") {
-                        installmentValue = message.result.term.monthly_payment.value;
-                        installmentTotal = message.result.term.monthly_payment.value;
-                    }
-                }
-                else {
-                    if (typeof (message.result.term) !== "undefined") {
-                        installmentNumber = message.result.term.term;
-                        installmentValue = message.result.term.monthly_payment.value;
-                        installmentTotal = message.result.payer.funding_option.funding_sources[0].amount.value;
-                    }
-                    else {
-                        installmentNumber = 1;
-                        installmentValue = message.result.payer.funding_option.funding_sources[0].amount.value;
-                        installmentTotal = message.result.payer.funding_option.funding_sources[0].amount.value;
+                        return false;
                     }
                 }
 
-                
+                if (typeof (message.result.term) !== "undefined" && installmentNumber === "1") {
+                    installmentValue = message.result.term.monthly_payment.value;
+                    installmentTotal = message.result.term.monthly_payment.value;
+                }
 
                 //var installmentNumber = 1;
                 //var installmentValue = '';
@@ -1439,9 +1244,11 @@ function messageListener(event) {
     catch (exc) { }
 }
 
+
 $(document).ready(function () {
 
     PayPalCheckout();
+    PayPalCheckoutReference();
     PayPalCheckoutInCart2();
 
     window.onload = function () {

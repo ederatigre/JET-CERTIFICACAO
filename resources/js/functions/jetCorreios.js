@@ -60,12 +60,10 @@ import { _alert, _confirm } from './message';
             for (let key in sel) {
                 if (sel[key] !== "") {
                     if (sel[key].isDropDown) {
-                        sel[key].clearing();                        
-                        $(sel[key].input).closest(".required").removeClass("success")
+                        sel[key].clearing();
                     }
                     else {
                         $(sel[key]).val("");
-                        $(sel[key]).closest(".required").removeClass("success")
                     }
                 }
             }
@@ -90,7 +88,6 @@ import { _alert, _confirm } from './message';
                             var obj = $.parseJSON(response.message);
                             atualizaCampos(obj);
                         } else {
-                            limpaForm()
                             _alert("", response.message, "warning");
                         }
                     },

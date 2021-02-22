@@ -40,42 +40,35 @@
                                             @{
                                                 if (gateways.IdPaymentGateway == 6)
                                                 {
-                                                    <div class="pagSeguroParcelamento"
+                                                    <div 
+                                                         class="pagSeguroParcelamento" 
                                                          id="pagSeguroParcelamento"
-                                                         data-paymentbrand="@brands.IdPaymentBrand"
-                                                         data-brand="@brands.Name.ToLower()">
-                                                    </div>
-                                                }
-                                                else if (gateways.IdPaymentGateway == 17)
-                                                {
-                                                    <div class="pagSeguroAppParcelamento"
-                                                         id="pagSeguroAppParcelamento"
                                                          data-paymentbrand="@brands.IdPaymentBrand"
                                                          data-brand="@brands.Name.ToLower()">
                                                     </div>
                                                 }
                                                 else
                                                 {
-                                                    foreach (var parcelas in brands.Installments)
-                                                    {
-                                                        var typeDiscount = brands.typeDiscount != null ? brands.typeDiscount.Value : DomainCheckout.Entities.typeDiscount.General;
-                                                        var totalCompra = parcelas.Total.ToString("C");
+                                                foreach (var parcelas in brands.Installments)
+                                                {
+                                                    var typeDiscount = brands.typeDiscount != null ? brands.typeDiscount.Value : DomainCheckout.Entities.typeDiscount.General;
+                                                    var totalCompra = parcelas.Total.ToString("C");
 
-                                                        if (parcelas.InstallmentNumber == 1)
+                                                    if (parcelas.InstallmentNumber == 1)
+                                                    {
+                                                        if (typeDiscount == DomainCheckout.Entities.typeDiscount.FirstInstalment)
                                                         {
-                                                            if (typeDiscount == DomainCheckout.Entities.typeDiscount.FirstInstalment)
-                                                            {
-                                                                totalCompra = parcelas.Value.ToString("C");
-                                                            }
+                                                            totalCompra = parcelas.Value.ToString("C");
                                                         }
-                                                        <span class="item parcelamentos">
-                                                            <span class="parcelas">@parcelas.InstallmentNumber x</span>
-                                                            <span class="valor"> @parcelas.Value.ToString("C") </span>
-                                                            <span class="modelo">(@parcelas.Description)</span>
-                                                            <span class="total">Total Parcelado: @totalCompra</span>
-                                                        </span>
                                                     }
+                                                    <span class="item parcelamentos">
+                                                        <span class="parcelas">@parcelas.InstallmentNumber x</span>
+                                                        <span class="valor"> @parcelas.Value.ToString("C") </span>
+                                                        <span class="modelo">(@parcelas.Description)</span>
+                                                        <span class="total">Total Parcelado: @totalCompra</span>
+                                                    </span>
                                                 }
+                                            }
                                             }
                                         </div>
                                     </div>

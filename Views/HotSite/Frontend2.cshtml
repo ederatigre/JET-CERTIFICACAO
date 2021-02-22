@@ -1,62 +1,89 @@
 @{
-    ViewBag.Title = "Certificacao";
-    Layout = "~/Views/Shared/Base/_LayoutBreadCrumbContent.cshtml";
+    ViewBag.Title = "Front End";
+    Layout = "~/Views/Shared/Base/_Layout.cshtml";
 }
 
-@section breadcrumbs {
-    <div class="ui container">
-        <div class="ui one column grid stackable middle aligned">
-            <div class="row">
-                <div class="column">
-                    <h1>@ViewBag.Title</h1>
-                    <div class="ui breadcrumb text small">
-                        <a class="section" href="/">Home</a>
-                        <i class="right angle icon divider"></i>
-                        <a class="section" href="/">Certificação</a>
-                        <i class="right angle icon divider"></i>
-                        <a class="section" href="/">Formulário</a>
+<style>
 
-                    </div>
-                </div>
+    .collum{
+        width: 40%;
+    }
 
-            </div>
+    .container-form{
+        display:flex;
+        flex-direction: row;
+        justify-content: center;
+        padding: 3%;
+    }
+
+    .field label{
+        padding: 2px 0px 0px 15px;
+        margin: 0px
+    }
+
+    .ui.content{
+        width: 30%;
+        align-self: center;
+    }
+
+    .espaco{
+        padding-left: 20px;
+    }
+
+    #editar{
+        visibility: hidden;
+        margin-bottom: 20px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button { 
+    -webkit-appearance: none;
+    
+    }
+</style>
+
+<div class= "ui grid container-form">
+    <div class="row ui grid">
+            <h3> Editar Dados </h3>
+        <div class="ui submit button" id="resgatar">
+            Recuperar
         </div>
     </div>
-}
-
-<div class="ui container margin bottom large">
-    <div class="ui grid">
-        <div class="eight wide column">            
-                <div class="field">
-                    <label><b>Nome:</b></label>
-                    <span id="nome"></span>
+    <div class="ui form row" id="editSessionForm">
+        <div class="collum">
+            <div class="field required">
+                <label>Nome</label>
+                <div class="ui left input">
+                    <input id="nome_guardado" type="text" name="nome" placeholder="Nome" disabled/>
                 </div>
-                <div class="field">
-                    <label><b>Email:</b></label>
-                    <span id="email"></span>
+            </div>
+            <div class="field required">
+                <label>E-mail</label>
+                <div class="ui left input">
+                    <input id="email_guardado" type="text" name="email" placeholder="E-mail" disabled/>
                 </div>
-                <div class="field">
-                    <label><b>Telefone:</b></label>
-                    <span id="telefone"></span>
+            </div>
+            <div class="field required">
+                <label>Telefone</label>
+                <div class="ui left input">
+                    <input id="tel_guardado" type="number" name="fone" placeholder="Informe o telefone com DDD somente numeros" disabled/>
                 </div>
-                <div class="field">
-                    <label><b>Assunto:</b></label>
-                    <span id="assunto"></span>
+            </div>
+            <div class="field required">
+                <label>Assunto</label>
+                <div class="ui left input">
+                    <input id="assunto_guardado" type="text" name="assunto" placeholder="Assunto" disabled/>
                 </div>
-                <div class="field">
-                    <label><b>Mensagem:</b></label>
-                    <span id="mensagem"></span>
+            </div>
+            <div class="field required">
+                <label>Mensagem</label>
+                <div class="ui left input">
+                    <textarea id="msg_guardado" disabled></textarea>
                 </div>
-
+            </div>
+            <div class="ui submit button " id='editar'>
+                Alterar
+            </div>
+            <div class="ui error message"></div>    
         </div>
     </div>
 </div>
-<script type="text/javascript">
-
-    document.getElementById("nome").innerText = sessionStorage.getItem("nome");
-    document.getElementById("email").innerText = sessionStorage.getItem("email");
-    document.getElementById("telefone").innerText = sessionStorage.getItem("telefone");
-    document.getElementById("assunto").innerText = sessionStorage.getItem("assunto");
-    document.getElementById("mensagem").innerText = sessionStorage.getItem("mensagem");
-    
-</script>

@@ -25,17 +25,10 @@ $(document).ready(function () {
             $("#progress_checkout").progress('increment');
         },
         onFinishedForm: function (form, fields) {
-            $(".row.barra-finalizacao").show();            
-            $(".info-message-mobile").addClass("hideme")
-            $("button", ".row.barra-finalizacao").removeClass('disabled');
+            $(".row.barra-finalizacao").show();
         },
         onUnFinishedForm: function (form, fields) {
-            if($(".info-message-mobile").length === 0) 
-                $('<div class="row info-message-mobile text center"><div class="column"><span class="ui label basic">Preencha os campos corretamente para prosseguir</span></div></div>').insertBefore($(".row.barra-finalizacao"))
-            else
-                $(".info-message-mobile").removeClass("hideme")
-            
-            $("button", ".row.barra-finalizacao").addClass('disabled');
+            $(".row.barra-finalizacao").hide();
         }
     });
 
@@ -53,10 +46,10 @@ $(document).ready(function () {
     })
 
     var creditcard_config = {
-            numberInput: "[id='CreditCard']", // optional — default input[name="number"]
-            cvcInput: "[id='CVV']",
-            nameInput: "[id='Name']"
-        },
+        numberInput: "[id='CreditCard']", // optional — default input[name="number"]
+        cvcInput: "[id='CVV']",
+        nameInput: "[id='Name']"
+    },
         creditcard_config1 = {
             numberInput: "[id='CreditCard1']", // optional — default input[name="number"]
             cvcInput: "[id='CVV1']",
@@ -286,39 +279,17 @@ $(document).ready(function () {
         }
     });
 
-    $(".termo-checkout").checkbox({
+    $(".termo.aceite").checkbox({
         onChecked: function () {
-            if(sessionStorage.getItem(".modal-term") === null) {
-                $(".modal-term").modal("show")
-                sessionStorage.setItem(".modal-term", "true");
-            }
-        }
-    });
-
-    $(".termo.aceite, .politica-privacidade").checkbox({
-        onChecked: function () {
-            if($(".termo.aceite").checkbox("is checked") && $(".politica-privacidade").checkbox("is checked"))
-                $(".row.barra-finalizacao").show();
-
+            $(".continuar").attr("disabled", true);
         },
         onUnchecked: function () {
-            $(".row.barra-finalizacao").hide();
+            $(".continuar").attr("disabled", false);
         }
     });
-
-
-    $("a", ".politica-privacidade").on("click", function() {
-        $(".modal-policy").modal({
-            closable  : false
-        }).modal('show')
-    })
-    
-    $(".ui.dropdown.search").dropdown({
+    $(".ui.dropdown.estado").dropdown({
         onChange: function (value, text, $selectedItem) {
-            if($(".form.jet.checkout").length === 1 && value !== "") {
-                $(this).closest(".required").addClass("success").data("jet-active", true)
-                $("input", this).blur();
-            }
+            $(this).parent().addClass("success");
         }
     });
     if (!isMobile()) {
@@ -344,5 +315,11 @@ $(document).ready(function () {
     if (isMobile()) {
         $(".box.detalhes, .box.success").sticky("destroy");
         $(".ui.accordion.compra div, .ui.accordion.resumo div, .ui.accordion.usuario div").removeClass("active");
+    }
+});
+
+$(".ui.dropdown").dropdown({
+    onChange: function () {
+        $(this).closest(".required").addClass("success").data("jet-active", true);
     }
 });

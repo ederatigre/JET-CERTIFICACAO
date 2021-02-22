@@ -63,14 +63,9 @@ $.fn.search.settings.templates.autoComplete = function (response, fields) {
 };
 
 $(document).on("keypress", ".prompt", function (e) {
-    let value = encodeURIComponent($(".searchMobile").is(":visible") ? $(".searchMobile .prompt").val() : $(".prompt:visible").val());
-
-    if (e.which === 13) {
-        if (value.length >= minCharacters)
+    let value = $(".searchMobile").is(":visible") ? $(".searchMobile .prompt").val() : $(".prompt").val();
+    if (e.which === 13)
         location.href = `/busca?n=${value}&mdf=${$("#metaDataField").val()}&mdv=${$("#metaDataValue").val()}`;
-        else
-            _alert("Busca", `Informe ao mínimo ${minCharacters} caracteres para efetuar a busca`, "warning");
-    }
 });
 
 
@@ -87,10 +82,8 @@ $(document).on("click", ".busca_lista_btn", function (e) {
 
 
 $(document).on("click", ".searchMobile .search-results", function (e) {
-    let value = encodeURIComponent($(".searchMobile").is(":visible") ? $(".searchMobile .prompt").val() : $(".prompt:visible").val());
-
-    if (value.length >= minCharacters)
-        location.href = `/busca?n=${value}&mdf=${$("#metaDataField").val()}&mdv=${$("#metaDataValue").val()}`;
+    if ($(".searchMobile .prompt").val().length >= minCharacters)
+        location.href = `/busca?n=${$(".searchMobile .prompt").val()}&mdf=${$("#metaDataField").val()}&mdv=${$("#metaDataValue").val()}`;
     else
         _alert("Busca", `Informe ao mínimo ${minCharacters} caracteres para efetuar a busca`, "warning");
 
@@ -138,7 +131,7 @@ $(document).ready(function () {
                         promptValue = $(this).val();
                     }
                 });
-                settings.data.n = decodeURIComponent(promptValue.replace(/[^a-zA-Z0-9À-ž\s]/gi, ''));
+                settings.data.n = promptValue;
                 // Quando for utilizar a busca com metadata separados por "|"
                 // settings.data.mdf = 'feature';
                 // settings.data.mdv = 'produto';
@@ -193,6 +186,7 @@ $(document).ready(function () {
 function showResultsClone() {
     $(".results-clone").removeClass("closed");
     $("#closeResultsMobile").removeClass("disabled");
+    
 }
 
 function hideResultsClone() {

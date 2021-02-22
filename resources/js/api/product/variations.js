@@ -180,7 +180,7 @@ variations = {
 
             btn = '\n\
                 <div class="ui variacao img" data-variation="'+ IdVariation +'" '+IdVariationFather+'>\n\
-                    <img src="' + imageURL + '" alt="' + Name + '" data-tooltip="' + Name + '" title="' + Name +'">\n\
+                    <img src="' + imageURL + '" alt="' + Name + '" data-tooltip="'+ Name +'">\n\
                     <div class="ui checkbox hideme checked">\n\
                         <input type="radio" name="' + Name + '" class="hidden">\n\
                         <label></label>\n\
@@ -214,20 +214,14 @@ variations = {
 
         container = $(this.config.container);
 
-        var selectInitial = new Array(),
-            referenceDefault = $('.references:not([data-active])', container);
+        var selectInitial = new Array();
 
         //caso nao exista uma grade default, setamos a primeira opcao
         if($('.references .variacao.select', container).length == 0) {
-            
-            
 
-            if($('.references', container).length > 1)
-                $(".references[data-active] .variacao:eq(0)", container).click();
-            else
-                referenceDefault = $(".references[data-active]", container);
+            $(".references[data-active] .variacao:eq(0)", container).click();
 
-            referenceDefault.each(function() {
+            $('.references:not([data-active])', container).each(function() {
                 if($(this).is(":last-child")) {
 
                     if($('.variacao:eq(0)', this).data("stock") > 0)
@@ -347,7 +341,7 @@ variations = {
     },
     getImageThumbnail: function() {
 
-        if(this.config.callAjaxImage && $(this.config.container).length > 0) {
+        if(this.config.callAjaxImage) {
             //setando as variacoes selecionadas para carregar as imagens de multifotos
             var variationSelect = new Array();
 
@@ -577,7 +571,7 @@ variations = {
         //setando as variacoes selecionadas para utilizacao no aviseme
         var variationSelect = new Array();
 
-        $('.references .variacao.select', "#variations-container").each(function() {
+        $('.references .variacao.select', this.config.container).each(function() {
             variationSelect.push($(this).data('variation'))
         });
 

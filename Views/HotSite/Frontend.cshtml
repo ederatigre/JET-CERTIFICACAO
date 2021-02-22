@@ -1,71 +1,115 @@
 @{
-    ViewBag.Title = "Certificacao";
-    Layout = "~/Views/Shared/Base/_LayoutBreadCrumbContent.cshtml";
+    ViewBag.Title = "Front End";
+    Layout = "~/Views/Shared/Base/_Layout.cshtml";
 }
 
-@section breadcrumbs {
-    <div class="ui container">
-        <div class="ui one column grid stackable middle aligned">
-            <div class="row">
-                <div class="column">
-                    <h1>@ViewBag.Title</h1>
-                    <div class="ui breadcrumb text small">
-                        <a class="section" href="/">Home</a>
-                        <i class="right angle icon divider"></i>
-                        <a class="section" href="/">Certificação</a>
-                        <i class="right angle icon divider"></i>
-                        <a class="section" href="/">Formulário</a>
+<style>
+    .ui.form{
+        width: 40%;
+        margin-right: 5%;
+    }
 
-                    </div>
+    .container-form{
+        display:flex;
+        flex-direction: row;
+        justify-content: center;
+        padding: 3%;
+    }
+
+    .field label{
+        padding: 2px 0px 0px 15px;
+        margin: 0px
+    }
+
+    .ui.content{
+        width: 30%;
+        align-self: center;
+    }
+
+    .espaco{
+        padding-left: 20px;
+    }
+
+    .ui.grid.fim {
+        justify-content: flex-end;
+        margin: 0 30px 30px 0;
+        visibility: hidden;
+    }
+
+    input[type=number]::-webkit-inner-spin-button { 
+    -webkit-appearance: none;
+    
+    }
+</style>
+
+<div class= "container-form">
+    <div class="ui form" id="addSessionForm">
+        <div>
+            <div class="field required">
+                <label>Nome</label>
+                <div class="ui left input">
+                    <input id="nome_cadastro" class="validaSession" type="text" name="nome" placeholder="Nome">
                 </div>
-
             </div>
+            <div class="field required">
+                <label>E-mail</label>
+                <div class="ui left input">
+                    <input id="email_cadastro" class="validaSession" type="text" name="email" placeholder="E-mail">
+                </div>
+            </div>
+            <div class="field required">
+                <label>Telefone</label>
+                <div class="ui left input">
+                    <input  id="tel_cadastro" class="validaSession" type="number" name="fone" placeholder="Informe o telefone com DDD somente numeros">
+                </div>
+            </div>
+            <div class="field required">
+                <label>Assunto</label>
+                <div class="ui left input">
+                    <input id="assunto_cadastro" class="validaSession" type="text" name="assunto" placeholder="Assunto">
+                </div>
+            </div>
+            <div class="field required">
+                <label>Mensagem</label>
+                <div class="ui left input">
+                    <textarea id="msg_cadastro" class="validaSession"></textarea>
+                </div>
+            </div>
+            <div class="ui submit button" id='salvar'>
+                Enviar
+            </div>
+            <div class="ui error message"></div>    
         </div>
     </div>
-}
 
-<div class="container_formulario">
-  <form class="ui form error">
-                <div class="field">
-                    <label>Nome</label>
-                    <input type="text" name="nome" id="nome" onblur="MostrarValor(this)" placeholder="Digite seu nome" required="required">
-                </div>
-                <div class="field">
-                    <label>Email</label>
-                    <input type="email" name="email" id="email" placeholder="Digite seu email" required="required" pattern="^[a-zA-Z0-9._+-]+@("@")[a-zA-Z0-9.-]+\.[a-zA-Z]{2,9}$" onblur="MostrarValor(this)">
-                </div>
-                <div class="field">
-                    <label>Telefone</label>
-                    <input type="text" name="telefone" id="telefone" placeholder="(99) 9999-9999" pattern="(\([0-9]{2}\))\s([9]{1})?([0-9]{4})-([0-9]{4})" title="Número de telefone precisa ser no formato (99) 9999-9999" required="required" onblur="MostrarValor(this)">
-                </div>
-                <div class="field">
-                    <label>Assunto</label>
-                    <input type="text" name="assunto" id="assunto" required="required" placeholder="informe o assunto" onblur="MostrarValor(this)">
-                </div>
-                <div class="field">
-                    <label>Mensagem</label>
-                    <textarea rows="2" name="mensagem" id="mensagem" required="required" onblur="MostrarValor(this)" placeholder="Em que podemos ajudar?" ></textarea>
-                </div>
-                <div class="ui error message"></div>
-                
-                <button class="ui button" type="submit" onclick="addSession()">Enviar</button>
-    </form>
-            <div class="result_form">
+    <div class="ui content">
+        <div class="ui grid">
             <h3>Nome:</h3>
-            <p id="nomeDigitado"></p>
+            <p class="espaco" id="nome_digitado"></p>
+        </div>
+        <div class="ui grid">
             <h3>Email:</h3>
-            <p id="emailDigitado"></p>
+            <p class="espaco" id="email_digitado"></p>
+        </div>
+        <div class="ui grid">
             <h3>Telefone:</h3>
-            <p id="foneDigitado"></p>
+            <p class="espaco" id="tel_digitado"></p>
+        </div>
+        <div class="ui grid">
             <h3>Assunto:</h3>
-            <p id="assuntoDigitado"></p>
+            <p class="espaco" id="assunto_digitado"></p>
+        </div>
+        <div class="ui grid">
             <h3>Mensagem:</h3>
-            <p id="msgDigitado"></p>
-         </div>      
+            <p class="espaco" id="msg_digitado"></p>
+        </div>
+    </div>
 </div>
+<div class="ui grid fim" id="proximo">
+    <div class="ui button">
+        <a href="/hotsite/frontend2">
+            Proximo
+        </a>
+    </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
+

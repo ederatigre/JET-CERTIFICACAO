@@ -1,6 +1,6 @@
 ﻿import { _alert, _confirm } from "../../functions/message";
 import { validarEmail } from "../../functions/validate";
-import { generateRecaptcha } from "../../ui/modules/recaptcha";
+import { generateRecaptcha }  from "../../ui/modules/recaptcha";
 
 $(document).ready(function () {
     if ($("#login").val() == "") {
@@ -20,7 +20,6 @@ $(document).ready(function () {
     $(document).on("click", "#Entrar", function () {
         var userName = $("#UserName").val();
         var password = $("#Password").val();
-        var returnUrl = $('.ui.modal.key-login').data("url");
         var $this = $(this);
 
         var form = $('#formAccessKey');
@@ -33,16 +32,16 @@ $(document).ready(function () {
             $this.addClass("loading");
 
             if (googleRecaptchaStatus) {
-                customerLogin(userName, password, returnUrl);
+                customerLogin(userName, password);
             } else{
 
                 if($("[id^=googleVersion]", form).val() === "2") {
                     if(generateRecaptcha($("[id^=googleModule]", form).val(), form))
-                        customerLogin(userName, password, returnUrl);
+                        customerLogin(userName, password);
                     else
                         $this.removeClass("loading");
                 } else {
-                    customerLogin(userName, password, returnUrl, $("[id^=googleResponse]").val());
+                    customerLogin(userName, password, $("[id^=googleResponse]").val());
                 }
 
 
@@ -62,7 +61,6 @@ $(document).ready(function () {
     $(document).on('submit', '#form-accesskey', function () {
 
         let strLogin = $('#login').val();
-        let googleResponse = $("[id^=googleResponse]", "body").length > 0 ? $("[id^=googleResponse]", "body").val() : "";
 
         let isValidEmail = validarEmail(strLogin);
         let isValidCpf = $.fn["jetCheckout"].validateCPF(strLogin);
@@ -74,13 +72,12 @@ $(document).ready(function () {
             data: {
                 __RequestVerificationToken: gettoken(),
                 email: isValidEmail ? strLogin : "",
-                cpfCnpj: (isValidCpf || isValidCnpj) ? strLogin : "",
-                googleResponse: googleResponse
+                cpfCnpj: (isValidCpf || isValidCnpj) ? strLogin : ""
             },
             success: function (data) {
                 if (data.Success == true && data.Message == "Login") {
                     $("#UserName").val(strLogin);
-                    $('.ui.modal.key-login').modal('show');
+                    $('.ui.modal').modal('show');
                 } else if (data.Success == true && data.Message == "CadastrarSenha") {
                     window.location.href = "/Customer/CheckAccessKey?email=" + data.Email;
                 } else if (data.Success == true && data.Message == "Cadastro") {
@@ -98,15 +95,6 @@ $(document).ready(function () {
             },
             error: function (data) {
                 _alert("", data.message, "error");
-            },
-            complete: function () {
-                if ($("[id^=googleVersion_]").length > 0 && typeof grecaptcha !== "undefined") {
-                    if ($("[id^=googleVersion_]").eq(0).val() === "2") {
-                        grecaptcha.reset();
-                    } else {
-                        generateRecaptcha($("[id^=googleModule]").val(), "body");
-                    }
-                }
             }
         });
         return false;
@@ -118,7 +106,7 @@ function gettoken() {
     return token;
 }
 
-function customerLogin(userName, password, returnUrl, tokenGoogleRecaptchaV3 = "") {
+function customerLogin(userName, password, tokenGoogleRecaptchaV3 = "") {
 
     var form = $('#formAccessKey');
     
@@ -129,7 +117,6 @@ function customerLogin(userName, password, returnUrl, tokenGoogleRecaptchaV3 = "
             __RequestVerificationToken: gettoken(),
             UserName: userName,
             Password: password,
-            returnUrl: returnUrl,
             googleResponse: tokenGoogleRecaptchaV3
         },
         success: function (data) {
